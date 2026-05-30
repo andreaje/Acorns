@@ -10,6 +10,7 @@ from conversation_state import (
 )
 from dialogue_manager import decide_dialogue_plan, record_dialogue_plan
 from guardrails import evaluate_guardrails
+from i18n import localize_coach_response
 from knowledge_base import retrieve_knowledge
 from llm_client import generate_response_details
 from tools import collect_tool_results
@@ -101,6 +102,27 @@ class CoachingFlowTests(unittest.TestCase):
 
         self.assertEqual(understanding["current_goal"], "financial freedom")
         self.assertEqual(understanding["stated_goal"], "financial freedom")
+
+    def test_localizes_german_wealth_building_response(self):
+        understanding, _, response = run_turn("Ich will reich werden.", create_conversation_context())
+        localized_response = localize_coach_response(response, "de")
+
+        self.assertEqual(understanding["goal_category"], "wealth_building")
+        self.assertIn("Vermögensaufbau ist das Ziel", localized_response)
+        self.assertIn("monatlichen Ausgaben", localized_response)
+        self.assertNotIn("Got it:", localized_response)
+
+    def test_localizes_spanish_fast_wealth_response(self):
+        understanding, _, response = run_turn(
+            "¿Cuál es la forma más rápida de lograr independencia financiera?",
+            create_conversation_context(),
+        )
+        localized_response = localize_coach_response(response, "es")
+
+        self.assertEqual(understanding["goal_category"], "wealth_building")
+        self.assertIn("No existe un atajo fiable", localized_response)
+        self.assertIn("riesgo real de pérdida", localized_response)
+        self.assertNotIn("There is no reliable shortcut", localized_response)
 
 
 if __name__ == "__main__":

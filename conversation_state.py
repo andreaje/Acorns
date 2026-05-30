@@ -62,6 +62,10 @@ GOAL_STATEMENT_PATTERNS = [
     r"\b(?:i|we)(?:\s+would|'d)\s+like\s+to\s+(.+)",
     r"\bmy\s+goal\s+is\s+(?:to\s+)?(.+)",
     r"\b(?:i|we)\s+(?:really\s+)?want\s+(.+)",
+    r"\b(?:ich|wir)\s+(?:m(?:ö|oe)chte|m(?:ö|oe)chten|will|wollen|hoffe|hoffen)\s+(.+)",
+    r"\bmein\s+ziel\s+ist\s+(?:es\s*,?\s*)?(.+)",
+    r"\b(?:quiero|queremos|me\s+gustar(?:í|i)a|nos\s+gustar(?:í|i)a|espero|esperamos)\s+(.+)",
+    r"\bmi\s+objetivo\s+es\s+(.+)",
 ]
 GOAL_CATEGORY_RULES = {
     "wealth_building": [
@@ -76,6 +80,17 @@ GOAL_CATEGORY_RULES = {
         "rich",
         "wealth",
         "wealthy",
+        "finanzielle freiheit",
+        "finanzielle unabhängigkeit",
+        "finanzielle unabhaengigkeit",
+        "reich",
+        "vermögen",
+        "vermoegen",
+        "libertad financiera",
+        "independencia financiera",
+        "patrimonio neto",
+        "rico",
+        "riqueza",
     ],
 }
 CONVERSATION_FRICTION_PHRASES = [

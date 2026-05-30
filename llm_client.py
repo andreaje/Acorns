@@ -12,7 +12,12 @@ REFLECTIONS = {
 
 
 def asks_for_speed(user_message: str) -> bool:
-    return bool(re.search(r"\b(?:fast\w*|quick\w*|rapid\w*|soon)\b", user_message.lower()))
+    return bool(
+        re.search(
+            r"\b(?:fast\w*|quick\w*|rapid\w*|soon|schnell\w*|rasch\w*|r(?:á|a)pid\w*|pronto)\b",
+            user_message.lower(),
+        )
+    )
 
 
 def format_tool_results(tool_results: dict) -> str:
