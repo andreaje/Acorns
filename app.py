@@ -763,6 +763,15 @@ if active_view == "coach":
                     understanding.update(knowledge_level)
                     understanding["financial_literacy"] = knowledge_level["knowledge_level"]
                     understanding["knowledge_level_evidence"] = knowledge_level["evidence"]
+                    guardrails_started = perf_counter()
+                    guardrail_result = evaluate_guardrails(
+                        prompt,
+                        knowledge_level.get("guardrail_categories"),
+                    )
+                    guardrail_result["out_of_domain_answer"] = knowledge_level.get("out_of_domain_answer")
+                    understanding["guardrail_categories"] = guardrail_result["categories"]
+                    understanding["guardrail_triggered"] = guardrail_result["guardrail_triggered"]
+                    guardrails_ms = (perf_counter() - guardrails_started) * 1000
                     user_model = {
                         key: understanding.get(key)
                         for key in [
@@ -788,13 +797,6 @@ if active_view == "coach":
                     retrieved_knowledge = retrieve_knowledge(understanding["primary_topic"])
                     tool_results = collect_tool_results(prompt, understanding["primary_topic"])
                     retrieval_ms = (perf_counter() - retrieval_started) * 1000
-
-                    guardrails_started = perf_counter()
-                    guardrail_result = evaluate_guardrails(
-                        prompt,
-                        knowledge_level.get("guardrail_categories"),
-                    )
-                    guardrails_ms = (perf_counter() - guardrails_started) * 1000
 
                     openai_started = perf_counter()
                     response_details = generate_llm_response(

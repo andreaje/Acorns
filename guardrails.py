@@ -3,9 +3,37 @@ GUARDRAIL_CATEGORIES = {
     "out_of_domain_request",
 }
 
+IN_DOMAIN_FINANCIAL_TOPICS = {
+    "budgeting",
+    "saving",
+    "investing education",
+    "retirement planning",
+    "debt",
+    "emergency funds",
+    "college savings",
+    "high-level tax education",
+    "financial goals",
+    "acorns/product-related financial questions",
+}
 
-def evaluate_guardrails(user_message: str, llm_categories: list[str] | None = None) -> dict:
-    del user_message  # Guardrail classification comes from the LLM understanding layer.
+OUT_OF_DOMAIN_EXAMPLES = {
+    "cooking / baking",
+    "medical",
+    "legal",
+    "technical support",
+    "home repair",
+    "relationship advice",
+    "general trivia",
+    "travel planning not tied to budgeting",
+}
+
+
+def evaluate_guardrails(
+    user_message: str,
+    llm_categories: list[str] | None = None,
+    out_of_domain_answer: str | None = None,
+) -> dict:
+    del user_message  # Guardrail categories come from the semantic understanding layer, not keyword matching.
     categories = list(
         dict.fromkeys(
             category
@@ -25,16 +53,20 @@ def evaluate_guardrails(user_message: str, llm_categories: list[str] | None = No
         "mode": "educational_only" if categories else "standard",
         "categories": categories,
         "guardrail_triggered": guardrail_triggered,
+        "out_of_domain_answer": out_of_domain_answer,
     }
 
 
 def guardrail_message(guardrail_result: dict) -> str:
     categories = guardrail_result.get("categories", [])
     if "out_of_domain_request" in categories:
+        helpful_answer = str(guardrail_result.get("out_of_domain_answer") or "").strip()
+        opening = f"{helpful_answer}\n\n" if helpful_answer else ""
         return (
-            "I am primarily here to help with financial questions and planning. For questions outside financial "
-            "coaching, consider consulting an appropriate qualified professional. If there is a related financial "
-            "concern, I can help you think through that."
+            opening +
+            "I'm primarily here to help with financial goals, budgeting, saving, investing education, retirement "
+            "planning, debt, emergency funds, college savings, high-level tax education, and Acorns-related financial "
+            "questions. Is there a financial topic I can help with today?"
         )
     if "personalized_financial_advice_boundary" in categories:
         return (

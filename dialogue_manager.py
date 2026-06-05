@@ -1,5 +1,7 @@
 import re
 
+from guardrails import evaluate_guardrails
+
 
 FOLLOW_UPS = {
     "cd": "Are you exploring CDs as a place to keep savings, or comparing them with investing options?",
@@ -100,6 +102,22 @@ def decide_dialogue_plan(
     conversation_context: dict | None = None,
 ) -> dict:
     context = conversation_context or {}
+    guardrail_categories = understanding.get("guardrail_categories", [])
+    guardrail_triggered = understanding.get("guardrail_triggered")
+    if (
+        guardrail_triggered == "out_of_domain_request"
+        or "out_of_domain_request" in guardrail_categories
+        or evaluate_guardrails(latest_user_message, guardrail_categories)["guardrail_triggered"] == "out_of_domain_request"
+    ):
+        return {
+            "dialogue_act": "brief_boundary_and_redirect",
+            "response_goal": "Briefly set the financial-coaching boundary and redirect back to financial coaching.",
+            "must_address": ["out-of-domain boundary", "financial coaching redirect"],
+            "next_information_needed": None,
+            "follow_up_question": None,
+            "avoid_repetition": False,
+            "captured_information": understanding.get("extracted_slots", {}),
+        }
     asked_question = bool(understanding.get("asked_question"))
     expressed_concern = bool(understanding.get("expressed_concern"))
     intent = understanding.get("intent")
